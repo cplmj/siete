@@ -79,53 +79,68 @@ ul { list-style: none; }
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 14px 32px;
-  transition: background 0.25s var(--ease-out),
-              color 0.25s var(--ease-out),
-              border-color 0.25s var(--ease-out),
-              transform 0.2s var(--ease-out);
   position: relative;
   overflow: hidden;
   white-space: nowrap;
+  transition: color 0.3s var(--ease-out), transform 0.2s var(--ease-out);
 }
-.ss-btn:focus-visible {
-  outline: 2px solid var(--c-cobalt);
-  outline-offset: 3px;
+.ss-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out);
+  z-index: 0;
 }
+.ss-btn > * { position: relative; z-index: 1; }
+.ss-btn:focus-visible { outline: 2px solid var(--c-cobalt); outline-offset: 3px; }
+
 .ss-btn--primary {
   background: var(--c-cobalt);
   color: var(--c-crude);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  border: 1px solid var(--c-cobalt);
 }
-.ss-btn--primary:hover { background: #3344ff; transform: translateY(-2px); }
+.ss-btn--primary::after { background: #2f3eff; }
+.ss-btn--primary:hover::after { transform: scaleX(1); }
+.ss-btn--primary:hover { transform: translateY(-2px); }
 .ss-btn--primary:active { transform: translateY(0); }
+
 .ss-btn--ghost {
   background: transparent;
   color: var(--c-crude);
   border: 1px solid var(--c-crude-15);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
-.ss-btn--ghost:hover { border-color: var(--c-cobalt); color: var(--c-cobalt); transform: translateY(-2px); }
+.ss-btn--ghost::after { background: var(--c-cobalt); }
+.ss-btn--ghost:hover::after { transform: scaleX(1); }
+.ss-btn--ghost:hover { color: var(--c-crude); border-color: var(--c-cobalt); transform: translateY(-2px); }
+
 .ss-btn--cta {
   background: var(--c-cobalt);
   color: var(--c-crude);
+  border: 1px solid var(--c-cobalt);
   padding: 11px 24px;
   font-size: 13px;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 }
-.ss-btn--cta:hover { background: #3344ff; transform: translateY(-2px); }
+.ss-btn--cta::after { background: #2f3eff; }
+.ss-btn--cta:hover::after { transform: scaleX(1); }
+.ss-btn--cta:hover { transform: translateY(-2px); }
+
 .ss-btn--outline {
   background: transparent;
   color: var(--c-black);
-  border: 2px solid var(--c-black);
-  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  border: 1px solid var(--c-black);
 }
-.ss-btn--outline:hover { background: var(--c-black); color: var(--c-crude); transform: translateY(-2px); }
+.ss-btn--outline::after { background: var(--c-black); }
+.ss-btn--outline:hover::after { transform: scaleX(1); }
+.ss-btn--outline:hover { color: var(--c-crude); transform: translateY(-2px); }
+
 .ss-btn--full { width: 100%; justify-content: center; }
 .ss-btn__loader {
   display: none;
   width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white;
+  border: 2px solid rgba(240,237,230,0.3);
+  border-top-color: var(--c-crude);
   border-radius: 50%;
   animation: ss-spin 0.7s linear infinite;
 }
@@ -192,11 +207,13 @@ ul { list-style: none; }
   display: flex; align-items: center; gap: 40px;
 }
 .ss-nav__logo {
-  font-size: 22px; font-weight: 900; letter-spacing: 0.08em;
-  color: var(--c-crude); text-transform: lowercase;
-  transition: color 0.2s; flex-shrink: 0;
+  color: var(--c-crude);
+  transition: color 0.25s, opacity 0.25s;
+  flex-shrink: 0;
+  display: flex; align-items: center;
 }
-.ss-nav__logo:hover { color: var(--c-cobalt); }
+.ss-nav__logo:hover { opacity: 0.75; }
+.ss-nav__mark { display: block; }
 .ss-nav__links { display: flex; gap: 32px; margin-left: auto; }
 .ss-nav__links a {
   font-size: 13px; font-weight: 600; letter-spacing: 0.16em;
@@ -227,15 +244,7 @@ ul { list-style: none; }
   min-height: 100svh; display: grid; grid-template-rows: 1fr auto;
   position: relative; overflow: hidden; padding-top: var(--nav-h);
 }
-.ss-hero__bg-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(var(--c-crude-08) 1px, transparent 1px),
-    linear-gradient(90deg, var(--c-crude-08) 1px, transparent 1px);
-  background-size: 60px 60px; pointer-events: none;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 0%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 40%, black 0%, transparent 100%);
-}
+.ss-hero__bg-grid { display: none; }
 .ss-hero__inner {
   display: flex; flex-direction: column; justify-content: center;
   padding: clamp(60px, 8vw, 120px) clamp(24px, 5vw, 80px);
@@ -262,11 +271,11 @@ ul { list-style: none; }
   letter-spacing: -0.01em; line-height: 0.9; color: var(--c-crude);
 }
 .ss-hero__accent-dot {
-  display: inline-block; color: var(--c-red);
-  font-size: clamp(80px, 12vw, 180px); line-height: 0;
-  position: absolute; bottom: -0.15em; right: -0.05em;
+  display: inline;
+  color: var(--c-red);
+  font-size: inherit;
   font-weight: 900;
-  animation: ss-pulse 3s ease-in-out infinite 1s;
+  animation: ss-pulse 2.4s ease-in-out infinite 1.2s;
 }
 .ss-hero__sub {
   font-size: clamp(16px, 2vw, 22px); font-weight: 400; line-height: 1.55;
@@ -299,7 +308,12 @@ ul { list-style: none; }
 @keyframes ss-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes ss-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes ss-fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes ss-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes ss-pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 0 transparent; }
+  40%       { opacity: 0.15; text-shadow: 0 0 40px var(--c-red); }
+  60%       { opacity: 0.15; }
+  80%       { opacity: 1; }
+}
 @keyframes ss-scroll-line {
   0%   { transform: scaleY(0); transform-origin: top; }
   50%  { transform: scaleY(1); transform-origin: top; }
@@ -310,7 +324,7 @@ ul { list-style: none; }
   .ss-hero__eyebrow, .ss-hero__headline, .ss-hero__sub, .ss-hero__actions, .ss-hero__scroll-hint { opacity: 1 !important; animation: none !important; }
   .ss-hero__marquee-track { animation: none; }
   .ss-hero__scroll-line { animation: none; }
-  .ss-hero__accent-dot { animation: none; }
+  .ss-hero__accent-dot { animation: none; opacity: 1 !important; }
 }
 
 /* ── SERVICIOS ── */
@@ -458,7 +472,7 @@ ul { list-style: none; }
   .ss-nav__links a::after { display: none; }
   .ss-nav__burger { display: flex; }
   .ss-nav__inner .ss-btn--cta { display: none; }
-  .ss-hero__accent-dot { display: none; }
+  /* accent-dot stays visible on mobile since it's inline now */
   .ss-hero__scroll-hint { display: none; }
   .ss-servicios__grid { grid-template-columns: 1fr; }
   .ss-portafolio__grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
@@ -487,7 +501,15 @@ ul { list-style: none; }
 
 <nav class="ss-nav" id="ss-nav" aria-label="Navegación principal">
   <div class="ss-nav__inner">
-    <a href="#hero" class="ss-nav__logo" aria-label="sietesiete — inicio">sietesiete</a>
+    <a href="#hero" class="ss-nav__logo" aria-label="sietesiete — inicio">
+      <svg class="ss-nav__mark" width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Marca tipográfica: dos 7s superpuestos, forma de "77" estilizado -->
+        <path d="M2 4 L14 4 L6 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M16 4 L28 4 L20 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <!-- Línea de acento cobalto -->
+        <line x1="2" y1="4" x2="28" y2="4" stroke="var(--c-cobalt)" stroke-width="1.5"/>
+      </svg>
+    </a>
     <button class="ss-nav__burger" id="ss-burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="ss-nav-menu">
       <span></span><span></span>
     </button>
@@ -509,12 +531,11 @@ ul { list-style: none; }
       <span>Estudio de branding</span>
     </div>
     <h1 class="ss-hero__headline" id="hero-headline">
-      <span class="ss-hero__headline-main">La marca que<br>mereces existir.</span>
-      <span class="ss-hero__accent-dot" aria-hidden="true">·</span>
+      <span class="ss-hero__headline-main">Si tu marca<br>se confunde,<br>hay un problema<span class="ss-hero__accent-dot" aria-hidden="true">.</span></span>
     </h1>
     <p class="ss-hero__sub">
-      Dirección de arte y diseño gráfico con criterio propio.<br>
-      Branding para pymes, personas y empresas que quieren diferenciarse de verdad.
+      Lo resolvemos juntos. Branding con criterio propio para pymes,<br>
+      personas y empresas que no quieren parecerse a nadie más.
     </p>
     <div class="ss-hero__actions">
       <a href="#portafolio" class="ss-btn ss-btn--primary">Ver portafolio</a>
