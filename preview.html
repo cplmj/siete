@@ -398,7 +398,8 @@ ul { list-style: none; }
   /* right: 25% cubre el último cuarto; restamos hasta el centro del cuadrado del paso 4 */
   right: calc(25% - 28px);
   height: 1px;
-  background: var(--c-crude-08);
+  background: var(--c-cobalt);
+  opacity: 0.35;
   z-index: 0;
 }
 .ss-paso { padding: 0 clamp(16px, 2vw, 32px); position: relative; z-index: 1; }
@@ -478,12 +479,17 @@ body.ss-landing [tabindex] { cursor: none; }
   transform: translate(-50%, -50%);
   transition: width 0.3s var(--ease-out),
               height 0.3s var(--ease-out),
+              background 0.3s var(--ease-out),
               opacity 0.2s;
   will-change: transform;
 }
 .ss-cursor.is-hovering {
   width: 56px;
   height: 56px;
+}
+/* Sobre botones: cursor toma el color del texto del botón (crudo) */
+.ss-cursor.is-on-btn {
+  background: var(--c-crude);
 }
 .ss-cursor.is-clicking {
   width: 8px; height: 8px;
@@ -499,13 +505,16 @@ body.ss-landing [tabindex] { cursor: none; }
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--c-crude);
+  color: var(--c-cobalt);
   opacity: 0;
   white-space: nowrap;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, color 0.3s;
   pointer-events: none;
 }
 .ss-cursor.is-hovering .ss-cursor__label { opacity: 1; }
+/* En botones oscuros el label es cobalto (ya definido arriba) */
+/* En botones sobre crudo (portafolio) el label es negro */
+.ss-cursor.is-on-btn-dark .ss-cursor__label { color: var(--c-black); }
 
 @media (pointer: coarse) {
   body.ss-landing { cursor: auto; }
@@ -979,16 +988,33 @@ body.ss-landing [tabindex] { cursor: none; }
     document.addEventListener('mouseup',   () => cursor.classList.remove('is-clicking'));
 
     /* Detectar elementos interactivos */
-    const interactive = 'a, button, .ss-btn, .ss-proyecto, input, textarea, [tabindex]';
+    const btns    = 'a.ss-btn, button.ss-btn, .ss-btn';
+    const others  = 'a:not(.ss-btn), button:not(.ss-btn), .ss-proyecto, input, textarea';
 
-    document.querySelectorAll(interactive).forEach(el => {
+    /* Botones: cursor crudo + label cobalto */
+    document.querySelectorAll(btns).forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('is-hovering', 'is-on-btn');
+        /* Detectar si el botón está sobre fondo crudo (portafolio) */
+        const section = el.closest('section');
+        if (section && getComputedStyle(section).backgroundColor.includes('240, 237, 230')) {
+          cursor.classList.add('is-on-btn-dark');
+        }
+        const btnLabel = el.querySelector('.ss-btn__label');
+        const text = btnLabel ? btnLabel.textContent.trim() : '';
+        label.textContent = text.length > 12 ? text.slice(0, 10) + '…' : text;
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('is-hovering', 'is-on-btn', 'is-on-btn-dark');
+        label.textContent = '';
+      });
+    });
+
+    /* Otros interactivos: cursor cobalto normal */
+    document.querySelectorAll(others).forEach(el => {
       el.addEventListener('mouseenter', () => {
         cursor.classList.add('is-hovering');
-        /* Leer el texto del botón si existe */
-        const btnLabel = el.querySelector('.ss-btn__label');
-        const text = btnLabel
-          ? btnLabel.textContent.trim()
-          : (el.getAttribute('aria-label') || '');
+        const text = el.getAttribute('aria-label') || '';
         label.textContent = text.length > 12 ? text.slice(0, 10) + '…' : text;
       });
       el.addEventListener('mouseleave', () => {
