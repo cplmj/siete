@@ -494,27 +494,6 @@ body.ss-landing [tabindex] { cursor: none; }
 .ss-cursor.is-clicking {
   width: 8px; height: 8px;
 }
-.ss-cursor__label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--c-cobalt);
-  opacity: 0;
-  white-space: nowrap;
-  transition: opacity 0.2s, color 0.3s;
-  pointer-events: none;
-}
-.ss-cursor.is-hovering .ss-cursor__label { opacity: 1; }
-/* En botones oscuros el label es cobalto (ya definido arriba) */
-/* En botones sobre crudo (portafolio) el label es negro */
-.ss-cursor.is-on-btn-dark .ss-cursor__label { color: var(--c-black); }
 
 @media (pointer: coarse) {
   body.ss-landing { cursor: auto; }
@@ -575,9 +554,7 @@ body.ss-landing [tabindex] { cursor: none; }
 <body class="ss-landing">
 
 <!-- Cursor personalizado -->
-<div class="ss-cursor" id="ss-cursor" aria-hidden="true">
-  <span class="ss-cursor__label" id="ss-cursor-label"></span>
-</div>
+<div class="ss-cursor" id="ss-cursor" aria-hidden="true"></div>
 
 <nav class="ss-nav" id="ss-nav" aria-label="Navegación principal">
   <div class="ss-nav__inner">
@@ -974,53 +951,34 @@ body.ss-landing [tabindex] { cursor: none; }
     if (window.matchMedia('(pointer: coarse)').matches) return;
 
     const cursor = $('#ss-cursor');
-    const label  = $('#ss-cursor-label');
     if (!cursor) return;
 
-    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    /* Seguimiento con requestAnimationFrame para máxima fluidez */
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    let cx = mx, cy = my;
 
-    document.addEventListener('mousemove', e => {
-      cx = e.clientX; cy = e.clientY;
+    function loop() {
+      cx += (mx - cx) * 0.18;
+      cy += (my - cy) * 0.18;
       cursor.style.transform = `translate(calc(${cx}px - 50%), calc(${cy}px - 50%))`;
-    });
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
 
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
     document.addEventListener('mousedown', () => cursor.classList.add('is-clicking'));
     document.addEventListener('mouseup',   () => cursor.classList.remove('is-clicking'));
 
-    /* Detectar elementos interactivos */
-    const btns    = 'a.ss-btn, button.ss-btn, .ss-btn';
-    const others  = 'a:not(.ss-btn), button:not(.ss-btn), .ss-proyecto, input, textarea';
-
-    /* Botones: cursor crudo + label cobalto */
-    document.querySelectorAll(btns).forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.classList.add('is-hovering', 'is-on-btn');
-        /* Detectar si el botón está sobre fondo crudo (portafolio) */
-        const section = el.closest('section');
-        if (section && getComputedStyle(section).backgroundColor.includes('240, 237, 230')) {
-          cursor.classList.add('is-on-btn-dark');
-        }
-        const btnLabel = el.querySelector('.ss-btn__label');
-        const text = btnLabel ? btnLabel.textContent.trim() : '';
-        label.textContent = text.length > 12 ? text.slice(0, 10) + '…' : text;
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.classList.remove('is-hovering', 'is-on-btn', 'is-on-btn-dark');
-        label.textContent = '';
-      });
+    /* Botones → cursor crudo */
+    $$('.ss-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering', 'is-on-btn'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering', 'is-on-btn'));
     });
 
-    /* Otros interactivos: cursor cobalto normal */
-    document.querySelectorAll(others).forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.classList.add('is-hovering');
-        const text = el.getAttribute('aria-label') || '';
-        label.textContent = text.length > 12 ? text.slice(0, 10) + '…' : text;
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.classList.remove('is-hovering');
-        label.textContent = '';
-      });
+    /* Otros interactivos → cursor cobalto expandido */
+    $$('a:not(.ss-btn), button:not(.ss-btn), .ss-proyecto, input, textarea').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering'));
     });
   }
 
