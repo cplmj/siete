@@ -488,8 +488,8 @@ body.ss-landing [tabindex] { cursor: none; }
   height: 56px;
 }
 .ss-cursor.is-on-btn {
-  background: transparent;
-  border: 1.5px solid var(--c-crude);
+  background: var(--c-black);
+  border: none;
 }
 .ss-cursor.is-clicking {
   width: 8px; height: 8px;
@@ -969,14 +969,14 @@ body.ss-landing [tabindex] { cursor: none; }
     document.addEventListener('mousedown', () => cursor.classList.add('is-clicking'));
     document.addEventListener('mouseup',   () => cursor.classList.remove('is-clicking'));
 
-    /* Botones → cursor crudo */
-    $$('.ss-btn').forEach(el => {
+    /* Botones + nav links → cursor negro */
+    $$('.ss-btn, .ss-nav__links a, .ss-footer__back').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering', 'is-on-btn'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering', 'is-on-btn'));
     });
 
     /* Otros interactivos → cursor cobalto expandido */
-    $$('a:not(.ss-btn), button:not(.ss-btn), .ss-proyecto, input, textarea').forEach(el => {
+    $$('a:not(.ss-btn):not(.ss-nav__links a):not(.ss-footer__back), .ss-proyecto, input, textarea').forEach(el => {
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering'));
     });
