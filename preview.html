@@ -96,6 +96,14 @@ ul { list-style: none; }
 .ss-btn > * { position: relative; z-index: 1; }
 .ss-btn:focus-visible { outline: 2px solid var(--c-cobalt); outline-offset: 3px; }
 
+.ss-btn__label {
+  display: inline-block;
+  transition: letter-spacing 0.35s var(--ease-out), transform 0.35s var(--ease-out);
+}
+.ss-btn:hover .ss-btn__label {
+  letter-spacing: 0.2em;
+}
+
 .ss-btn--primary {
   background: var(--c-cobalt);
   color: var(--c-crude);
@@ -103,8 +111,8 @@ ul { list-style: none; }
 }
 .ss-btn--primary::after { background: #2f3eff; }
 .ss-btn--primary:hover::after { transform: scaleX(1); }
-.ss-btn--primary:hover { transform: translateY(-2px); }
-.ss-btn--primary:active { transform: translateY(0); }
+.ss-btn--primary:hover { transform: scale(1.04); }
+.ss-btn--primary:active { transform: scale(1); }
 
 .ss-btn--ghost {
   background: transparent;
@@ -113,7 +121,7 @@ ul { list-style: none; }
 }
 .ss-btn--ghost::after { background: var(--c-cobalt); }
 .ss-btn--ghost:hover::after { transform: scaleX(1); }
-.ss-btn--ghost:hover { color: var(--c-crude); border-color: var(--c-cobalt); transform: translateY(-2px); }
+.ss-btn--ghost:hover { color: var(--c-crude); border-color: var(--c-cobalt); transform: scale(1.04); }
 
 .ss-btn--cta {
   background: var(--c-cobalt);
@@ -124,7 +132,7 @@ ul { list-style: none; }
 }
 .ss-btn--cta::after { background: #2f3eff; }
 .ss-btn--cta:hover::after { transform: scaleX(1); }
-.ss-btn--cta:hover { transform: translateY(-2px); }
+.ss-btn--cta:hover { transform: scale(1.05); }
 
 .ss-btn--outline {
   background: transparent;
@@ -133,7 +141,7 @@ ul { list-style: none; }
 }
 .ss-btn--outline::after { background: var(--c-black); }
 .ss-btn--outline:hover::after { transform: scaleX(1); }
-.ss-btn--outline:hover { color: var(--c-crude); transform: translateY(-2px); }
+.ss-btn--outline:hover { color: var(--c-crude); transform: scale(1.04); }
 
 .ss-btn--full { width: 100%; justify-content: center; }
 .ss-btn__loader {
@@ -446,6 +454,61 @@ ul { list-style: none; }
 .ss-footer__back { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--c-crude-08); color: var(--c-gray); transition: border-color 0.2s, color 0.2s, transform 0.3s var(--ease-out); }
 .ss-footer__back:hover { border-color: var(--c-cobalt); color: var(--c-cobalt); transform: translateY(-3px); }
 
+/* ── CURSOR PERSONALIZADO ── */
+body.ss-landing { cursor: none; }
+body.ss-landing a,
+body.ss-landing button,
+body.ss-landing [tabindex] { cursor: none; }
+
+.ss-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--c-cobalt);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s var(--ease-out),
+              height 0.25s var(--ease-out),
+              background 0.25s,
+              opacity 0.2s;
+  will-change: transform;
+}
+.ss-cursor.is-hovering {
+  width: 48px;
+  height: 48px;
+  background: rgba(31,43,255,0.18);
+  border: 1.5px solid var(--c-cobalt);
+}
+.ss-cursor.is-clicking {
+  width: 8px; height: 8px;
+  background: var(--c-cobalt);
+}
+.ss-cursor__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-cobalt);
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.ss-cursor.is-hovering .ss-cursor__label { opacity: 1; }
+
+@media (pointer: coarse) {
+  body.ss-landing { cursor: auto; }
+  .ss-cursor { display: none; }
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .ss-proceso__steps { grid-template-columns: repeat(2, 1fr); gap: 40px 0; }
@@ -499,6 +562,11 @@ ul { list-style: none; }
 </head>
 <body class="ss-landing">
 
+<!-- Cursor personalizado -->
+<div class="ss-cursor" id="ss-cursor" aria-hidden="true">
+  <span class="ss-cursor__label" id="ss-cursor-label"></span>
+</div>
+
 <nav class="ss-nav" id="ss-nav" aria-label="Navegación principal">
   <div class="ss-nav__inner">
     <a href="#hero" class="ss-nav__logo" aria-label="sietesiete — inicio">
@@ -519,7 +587,7 @@ ul { list-style: none; }
       <li><a href="#proceso">Proceso</a></li>
       <li><a href="#sobre-mi">Sobre mí</a></li>
     </ul>
-    <a href="#contacto" class="ss-btn ss-btn--cta">Hablemos</a>
+    <a href="#contacto" class="ss-btn ss-btn--cta"><span class="ss-btn__label">Hablemos</span></a>
   </div>
 </nav>
 
@@ -538,8 +606,8 @@ ul { list-style: none; }
       personas y empresas que no quieren parecerse a nadie más.
     </p>
     <div class="ss-hero__actions">
-      <a href="#portafolio" class="ss-btn ss-btn--primary">Ver portafolio</a>
-      <a href="#contacto" class="ss-btn ss-btn--ghost">Trabajemos juntos</a>
+      <a href="#portafolio" class="ss-btn ss-btn--primary"><span class="ss-btn__label">Ver portafolio</span></a>
+      <a href="#contacto" class="ss-btn ss-btn--ghost"><span class="ss-btn__label">Trabajemos juntos</span></a>
     </div>
     <div class="ss-hero__scroll-hint" aria-hidden="true">
       <span class="ss-hero__scroll-line"></span>
@@ -639,7 +707,7 @@ ul { list-style: none; }
       </article>
     </div>
     <div class="ss-portafolio__footer">
-      <a href="#contacto" class="ss-btn ss-btn--outline">¿Hablamos de tu proyecto?</a>
+      <a href="#contacto" class="ss-btn ss-btn--outline"><span class="ss-btn__label">¿Hablamos de tu proyecto?</span></a>
     </div>
   </div>
 </section>
@@ -889,6 +957,44 @@ ul { list-style: none; }
     });
   }
 
+  function initCursor() {
+    if (prefersReducedMotion) return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    const cursor = $('#ss-cursor');
+    const label  = $('#ss-cursor-label');
+    if (!cursor) return;
+
+    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', e => {
+      cx = e.clientX; cy = e.clientY;
+      cursor.style.transform = `translate(calc(${cx}px - 50%), calc(${cy}px - 50%))`;
+    });
+
+    document.addEventListener('mousedown', () => cursor.classList.add('is-clicking'));
+    document.addEventListener('mouseup',   () => cursor.classList.remove('is-clicking'));
+
+    /* Detectar elementos interactivos */
+    const interactive = 'a, button, .ss-btn, .ss-proyecto, input, textarea, [tabindex]';
+
+    document.querySelectorAll(interactive).forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('is-hovering');
+        /* Leer el texto del botón si existe */
+        const btnLabel = el.querySelector('.ss-btn__label');
+        const text = btnLabel
+          ? btnLabel.textContent.trim()
+          : (el.getAttribute('aria-label') || '');
+        label.textContent = text.length > 12 ? text.slice(0, 10) + '…' : text;
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('is-hovering');
+        label.textContent = '';
+      });
+    });
+  }
+
   function initSmoothScroll() {
     if (prefersReducedMotion) return;
     $$('a[href^="#"]').forEach(link => {
@@ -909,6 +1015,7 @@ ul { list-style: none; }
     initScrollReveal();
     initMarquee();
     initForm();
+    initCursor();
     initSmoothScroll();
   }
 
